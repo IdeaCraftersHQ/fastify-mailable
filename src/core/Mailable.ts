@@ -151,4 +151,11 @@ export abstract class Mailable implements MailableContract {
       data: this.markdownData
     }
   }
+
+  async renderHtml(): Promise<string | null> {
+    await this.build()
+    const content = await this.render()
+    
+    return content.html || null
+  }
 }

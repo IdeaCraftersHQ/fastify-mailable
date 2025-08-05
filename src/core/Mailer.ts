@@ -127,4 +127,8 @@ export class Mailer implements MailerContract {
       await this.transport.close()
     }
   }
+
+  async renderHtml(mailable: Mailable): Promise<string | null> {
+    return mailable.renderHtml()
+  }
 }

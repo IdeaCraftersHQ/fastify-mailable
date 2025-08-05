@@ -127,6 +127,7 @@ export interface MailableContract {
   mailer(name: string): this
   build(): this | Promise<this>
   render(): Promise<EmailContent>
+  renderHtml(): Promise<string | null>
 }
 
 export interface MailerContract {
@@ -135,4 +136,5 @@ export interface MailerContract {
   later(delay: number, mailable: MailableContract): Promise<any>
   bulk(mailables: MailableContract[]): Promise<any[]>
   raw(content: EmailContent): Promise<any>
+  renderHtml(mailable: MailableContract): Promise<string | null>
 }
