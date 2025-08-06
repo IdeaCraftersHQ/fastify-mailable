@@ -10,6 +10,6 @@ declare module 'fastify' {
   }
 
   interface FastifyRequest {
-    mail: () => MailerContract
+    mail(): MailerContract
   }
 }

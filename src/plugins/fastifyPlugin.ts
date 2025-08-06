@@ -1,20 +1,9 @@
 import fp from 'fastify-plugin'
 import { FastifyInstance } from 'fastify'
-import { FastifyMailableOptions, MailerContract } from '../types'
+import { FastifyMailableOptions } from '../types'
 import { MailManager } from '../core/MailManager'
 import { Mailable } from '../core/Mailable'
 
-declare module 'fastify' {
-  interface FastifyInstance {
-    mail: MailerContract
-    mailManager: MailManager
-    mailable: typeof Mailable
-  }
-
-  interface FastifyRequest {
-    mail: () => MailerContract
-  }
-}
 
 async function fastifyMailable(
   fastify: FastifyInstance,
@@ -35,11 +24,9 @@ async function fastifyMailable(
   fastify.decorate('mail', mailManager.mailer())
   fastify.decorate('mailable', Mailable)
 
-  // Decorate request with getter
-  fastify.decorateRequest('mail', {
-    getter() {
-      return () => mailManager.mailer()
-    }
+  // Decorate request with function (Fastify 5 compatibility)
+  fastify.decorateRequest('mail', function() {
+    return mailManager.mailer()
   })
 
   // Close all transports on server close
@@ -49,6 +36,6 @@ async function fastifyMailable(
 }
 
 export default fp(fastifyMailable, {
-  fastify: '4.x',
+  fastify: '>=5.0.0',
   name: '@ideacrafters/fastify-mailable'
 })
