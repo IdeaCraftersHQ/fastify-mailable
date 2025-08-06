@@ -37,7 +37,8 @@ export abstract class Mailable implements MailableContract {
   }
 
   from(address: RecipientInput): this {
-    this.content.from = normalizeRecipients(address)?.[0]
+    // Keep the raw input to preserve formatting
+    this.content.from = address
     return this
   }
 

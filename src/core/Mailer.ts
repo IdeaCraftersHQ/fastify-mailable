@@ -6,7 +6,7 @@ import {
   RecipientInput
 } from '../types'
 import { Mailable } from './Mailable'
-import { formatRecipients } from '../utils/recipients'
+import { formatRecipients, formatRecipient, normalizeRecipients } from '../utils/recipients'
 
 export class Mailer implements MailerContract {
   constructor(
@@ -109,7 +109,11 @@ export class Mailer implements MailerContract {
       prepared.replyTo = formatRecipients(prepared.replyTo as any)
     }
     if (prepared.from) {
-      prepared.from = formatRecipients([prepared.from as any])?.[0]
+      // Fix from address handling - should be a single string, not an array
+      const normalizedFrom = normalizeRecipients(prepared.from as any)
+      if (normalizedFrom && normalizedFrom.length > 0) {
+        prepared.from = formatRecipient(normalizedFrom[0])
+      }
     }
 
     return prepared

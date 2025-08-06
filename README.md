@@ -245,6 +245,33 @@ expect(emails).toHaveLength(1)
 expect(emails[0].subject).toBe('Welcome!')
 ```
 
+## Error Handling
+
+The module properly handles SMTP errors and will throw exceptions when emails fail to send:
+
+```typescript
+try {
+  await fastify.mail.send(new WelcomeEmail(user))
+} catch (error) {
+  // Handle specific SMTP errors
+  const message = error.message
+  
+  if (message.includes('Invalid sender')) {
+    // Sender address is not verified/allowed
+  } else if (message.includes('rejected')) {
+    // Email was rejected by SMTP server
+  } else {
+    // Other sending errors
+  }
+}
+```
+
+Common error scenarios:
+- **Invalid sender**: The from address is not verified with your SMTP provider
+- **Rejected recipients**: The SMTP server rejected one or more recipients
+- **Authentication errors**: Invalid SMTP credentials
+- **Connection errors**: Unable to connect to SMTP server
+
 ## API Reference
 
 ### Mailable Methods

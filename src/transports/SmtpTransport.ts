@@ -13,6 +13,21 @@ export class SmtpTransport implements Transport {
   async send(mail: EmailContent): Promise<any> {
     try {
       const info = await this.transporter.sendMail(mail as any)
+      
+      // Check if email was rejected
+      if (info.rejected && info.rejected.length > 0) {
+        throw new Error(`Email rejected by SMTP server: ${info.rejected.join(', ')}`)
+      }
+      
+      // Check response for common error patterns
+      if (info.response && typeof info.response === 'string') {
+        const lowerResponse = info.response.toLowerCase()
+        if (lowerResponse.includes('error') || lowerResponse.includes('fail') || 
+            lowerResponse.includes('invalid') || lowerResponse.includes('rejected')) {
+          throw new Error(`SMTP server error: ${info.response}`)
+        }
+      }
+      
       return {
         messageId: info.messageId,
         envelope: info.envelope,
@@ -22,7 +37,13 @@ export class SmtpTransport implements Transport {
         response: info.response
       }
     } catch (error) {
-      throw new Error(`Failed to send email: ${(error as Error).message}`)
+      // Preserve original error details
+      const err = error as any
+      const errorMessage = err.responseCode 
+        ? `SMTP Error ${err.responseCode}: ${err.response || err.message}`
+        : `Failed to send email: ${err.message}`
+      
+      throw new Error(errorMessage)
     }
   }
 

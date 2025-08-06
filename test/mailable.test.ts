@@ -184,7 +184,7 @@ describe('Mailable', () => {
       const content = await mailable.render()
       
       expect(content.to).toEqual([{ address: 'user@example.com' }])
-      expect(content.from).toEqual({ address: 'sender@example.com' })
+      expect(content.from).toBe('sender@example.com')
       expect(content.subject).toBe('Test')
       expect(content.priority).toBe('high')
       expect(content.text).toBe('Text content')
