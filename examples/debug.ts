@@ -62,16 +62,16 @@ fastify.get('/debug-email', async (request, reply) => {
     // Create the mailable
     const email = new DebugEmail(user)
     
-    // Render just the HTML content
-    const html = await email.renderHtml()
+    // Render the email content
+    const content = await email.render()
     
-    if (!html) {
+    if (!content.html) {
       return reply.code(404).send({ error: 'No HTML content found' })
     }
 
     // Return HTML for browser preview
     reply.type('text/html')
-    return html
+    return content.html
   } catch (error) {
     request.log.error(error)
     return reply.code(500).send({ 
@@ -89,14 +89,14 @@ fastify.get('/debug-email-via-mailer', async (request, reply) => {
 
   try {
     const email = new DebugEmail(user)
-    const html = await fastify.mail.renderHtml(email)
+    const content = await email.render()
     
-    if (!html) {
+    if (!content.html) {
       return reply.code(404).send({ error: 'No HTML content found' })
     }
 
     reply.type('text/html')
-    return html
+    return content.html
   } catch (error) {
     request.log.error(error)
     return reply.code(500).send({ 

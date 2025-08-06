@@ -24,19 +24,24 @@ class NoHtmlMailable extends Mailable {
   }
 }
 
-describe('Mailable renderHtml', () => {
-  it('should render HTML content', async () => {
+describe('Mailable render', () => {
+  it('should render email content with HTML', async () => {
     const mailable = new TestDebugMailable('John')
-    const html = await mailable.renderHtml()
+    const content = await mailable.render()
     
-    expect(html).toBe('<h1>Hello John!</h1><p>This is a test email.</p>')
+    expect(content.html).toBe('<h1>Hello John!</h1><p>This is a test email.</p>')
+    expect(content.text).toBe('Hello John! This is a test email.')
+    expect(content.subject).toBe('Test Email')
+    expect(content.to).toEqual([{ address: 'test@example.com' }])
   })
 
-  it('should return null when no HTML content', async () => {
+  it('should render email content without HTML', async () => {
     const mailable = new NoHtmlMailable()
-    const html = await mailable.renderHtml()
+    const content = await mailable.render()
     
-    expect(html).toBeNull()
+    expect(content.html).toBeUndefined()
+    expect(content.text).toBe('This email has no HTML content.')
+    expect(content.subject).toBe('Text Only')
   })
 
   it('should call build before rendering', async () => {
@@ -50,9 +55,27 @@ describe('Mailable renderHtml', () => {
     }
 
     const mailable = new BuildTestMailable()
-    const html = await mailable.renderHtml()
+    const content = await mailable.render()
     
     expect(buildCalled).toBe(true)
-    expect(html).toBe('<p>Built successfully</p>')
+    expect(content.html).toBe('<p>Built successfully</p>')
+  })
+
+  it('should only call build once even with multiple render calls', async () => {
+    let buildCount = 0
+    
+    class CountBuildMailable extends Mailable {
+      build() {
+        buildCount++
+        return this.html('<p>Built</p>')
+      }
+    }
+
+    const mailable = new CountBuildMailable()
+    await mailable.render()
+    await mailable.render()
+    await mailable.render()
+    
+    expect(buildCount).toBe(1)
   })
 })

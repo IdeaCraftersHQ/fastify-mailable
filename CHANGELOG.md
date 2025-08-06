@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.1] - 2024-12-19
 
+### Changed
+- Removed `renderHtml()` method in favor of simpler `render()` method
+  - Use `const content = await mailable.render()` and access `content.html`
+  - The `render()` method now automatically calls `build()` if needed
+  - Prevents duplicate builds with internal flag
+- Simplified internal architecture to avoid redundant build calls
+
 ### Fixed
 - **Critical**: Fixed SMTP transport returning false success when emails fail to send
   - Now properly detects and throws errors for rejected emails

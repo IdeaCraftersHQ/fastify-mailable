@@ -16,10 +16,7 @@ export class Mailer implements MailerContract {
   ) {}
 
   async send(mailable: Mailable): Promise<any> {
-    // Build the mailable
-    await mailable.build()
-
-    // Render the email content
+    // Render the email content (includes building)
     const content = await this.renderMailable(mailable)
 
     // Apply default from if not set
@@ -132,7 +129,4 @@ export class Mailer implements MailerContract {
     }
   }
 
-  async renderHtml(mailable: Mailable): Promise<string | null> {
-    return mailable.renderHtml()
-  }
 }

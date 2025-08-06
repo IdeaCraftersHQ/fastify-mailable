@@ -13,6 +13,7 @@ export abstract class Mailable implements MailableContract {
   protected markdownTemplate?: string
   protected markdownData?: any
   protected selectedMailer?: string
+  private built = false
 
   abstract build(): this | Promise<this>
 
@@ -123,7 +124,13 @@ export abstract class Mailable implements MailableContract {
   }
 
   async render(): Promise<EmailContent> {
-    // This method will be enhanced when we implement template engines
+    // Build the mailable if not already built
+    if (!this.built) {
+      await this.build()
+      this.built = true
+    }
+    
+    // Return a copy of the content
     return { ...this.content }
   }
 
@@ -153,10 +160,4 @@ export abstract class Mailable implements MailableContract {
     }
   }
 
-  async renderHtml(): Promise<string | null> {
-    await this.build()
-    const content = await this.render()
-    
-    return content.html || null
-  }
 }

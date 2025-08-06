@@ -222,6 +222,32 @@ const handlebarsEngine = new HandlebarsEngine({
 mailManager.setTemplateEngine(handlebarsEngine)
 ```
 
+## Debugging and Preview
+
+You can render a mailable without sending it to preview the content:
+
+```typescript
+const email = new WelcomeEmail(user)
+const content = await email.render()
+
+// Access email properties
+console.log(content.subject)    // Email subject
+console.log(content.to)         // Recipients
+console.log(content.from)       // Sender
+console.log(content.html)       // HTML content
+console.log(content.text)       // Plain text content
+console.log(content.attachments) // Attachments
+
+// Preview HTML in browser
+fastify.get('/preview-email', async (request, reply) => {
+  const email = new WelcomeEmail({ name: 'John', email: 'john@example.com' })
+  const content = await email.render()
+  
+  reply.type('text/html')
+  return content.html || 'No HTML content'
+})
+```
+
 ## Testing
 
 Use the array transport for testing:
@@ -291,6 +317,8 @@ Common error scenarios:
 - `html(content)` - Set HTML content
 - `markdown(template, data)` - Use markdown template
 - `mailer(name)` - Use specific mailer
+- `render()` - Render the email content without sending
+- `build()` - Build the mailable (usually called automatically)
 
 ### Mailer Methods
 
