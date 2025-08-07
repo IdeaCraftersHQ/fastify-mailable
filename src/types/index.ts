@@ -136,3 +136,16 @@ export interface MailerContract {
   bulk(mailables: MailableContract[]): Promise<any[]>
   raw(content: EmailContent): Promise<any>
 }
+
+// Module augmentation for Fastify
+declare module 'fastify' {
+  interface FastifyInstance {
+    mail: MailerContract
+    mailManager: import('../core/MailManager').MailManager
+    mailable: typeof import('../core/Mailable').Mailable
+  }
+
+  interface FastifyRequest {
+    mail(): MailerContract
+  }
+}
